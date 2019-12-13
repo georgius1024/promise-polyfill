@@ -1,8 +1,8 @@
 {
   "name": "promise_polyfill",
   "version": "1.0.0",
-  "description": "My Promise polifyll",
-  "main": "src/index.js",
+  "description": "My Promise polyfill",
+  "main": "src/Promise.js",
   "scripts": {
     "test": "jest"
   },
@@ -17,9 +17,7 @@
     "eslint-plugin-jest": "^23.0.3",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-vue": "^5.0.0",
-    "jest": "^24.9.0"
-  },
-  "dependencies": {
+    "jest": "^24.9.0",
     "@types/jest": "^24.0.23"
   }
 }
