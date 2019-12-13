@@ -1,4 +1,4 @@
-const Promise = require('../src/Promise')
+import Promise from '../src/Promise'
 
 describe('Promise', () => {
   jest.useFakeTimers()
@@ -309,7 +309,6 @@ describe('Promise', () => {
       Promise
         .allSettled(promises)
         .then(response => {
-          console.log(response)
           expect(response.map(e => e.status)).toEqual([
             'fulfilled',
             'fulfilled',
@@ -319,6 +318,42 @@ describe('Promise', () => {
         })
       jest.runTimersToTime(10)
     }, 100)
-
   })
+
+  describe('Promise.race', () => {
+
+    it('Return first promises', done => {
+      const promises = [
+        delay(1, 3),
+        delay(4, 2),
+        delay(6, 1)
+      ]
+      Promise
+      .race(promises)
+      .then(response => {
+        expect(response).toEqual(3)
+        done()
+      })
+      jest.runTimersToTime(20)
+    }, 100)
+
+    it('Catches exceptions', done => {
+      const promises = [
+        delay(1, 3),
+        delay(2, 2),
+        Promise.reject(new Error('42'))
+      ]
+      Promise
+      .race(promises)
+      .then(response => {
+        expect(1).toBe(2)
+      }, error => {
+        expect(error).toBeInstanceOf(Error)
+        expect(error.message).toBe('42')
+        done()
+      })
+      jest.runTimersToTime(10)
+    }, 100)
+  })
+
 })

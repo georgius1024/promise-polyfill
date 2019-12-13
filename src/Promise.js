@@ -8,12 +8,18 @@ function Promise(resolver) {
   this.value = undefined
 
   this.onFulfilled = (result) => {
+    if (this.status !== PENDING) {
+      return
+    }
     this.value = result
     this.status = FULFILLED
     this.notify(result, 0)
   }
 
   this.onRejected = (error) => {
+    if (this.status !== PENDING) {
+      return
+    }
     this.value = error
     this.status = REJECTED
     this.notify(error, 1)
@@ -101,38 +107,50 @@ Promise.all = function (promises) {
 }
 
 Promise.allSettled = function (promises) {
-  return new Promise(resolve) => {
-    const results = []
-    let filled = 0
-    results.length = promises.length
-    promises.forEach((promise, index) => {
+  return new Promise(resolve =>
+    {
+      const results = []
+      let filled = 0
+      results.length = promises.length
+      promises.forEach((promise, index) => {
+        promise.then(
+          (result) => {
+            console.log(result)
+            results[index] = {
+              status: 'fulfilled',
+              value: result
+            }
+            filled++
+            if (filled === results.length) {
+              resolve(results)
+            }
+          },
+          (error) => {
+            console.log(error)
+            results[index] = {
+              status: 'rejected',
+              reason: error
+            }
+            filled++
+            if (filled === results.length) {
+              resolve(results)
+            }
+          }
+        )
+      })
+    }
+  )
+}
+
+Promise.race = function (promises) {
+  return new Promise((resolve, reject) => {
+    promises.forEach(promise => {
       promise.then(
-        (result) => {
-          console.log(result)
-          results[index] = {
-            status: 'fulfilled',
-            value: result
-          }
-          filled++
-          if (filled === results.length) {
-            resolve(results)
-          }
-        },
-        (error) => {
-          console.log(error)
-          results[index] = {
-            status: 'rejected',
-            reason: error
-          }
-          filled++
-          if (filled === results.length) {
-            resolve(results)
-          }
-        }
+        result => resolve(result),
+        error => reject(error)
       )
     })
   })
 }
 
-
-module.exports = Promise
+export default Promise
